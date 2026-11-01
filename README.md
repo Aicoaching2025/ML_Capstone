@@ -6,7 +6,7 @@ This project studies NYISO Zone J hourly electricity demand at rolling 1-hour an
 
 ## Current status
 
-The local project scaffold, dependency lockfile, synthetic sample, validation checks, and Databricks smoke notebook are prepared. Real data acquisition and forecasting experiments have not begun. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
+The local project scaffold, dependency lockfile, synthetic sample, validation checks, forecast-timing safeguards, and Databricks smoke notebook are prepared. Real data acquisition and forecasting experiments have not begun. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
 
 ## Local setup
 
@@ -42,3 +42,12 @@ See [the exact platform setup guide](docs/platform_setup.md) for GitHub, Databri
 Do not commit real raw data, credentials, `.env` files, private keys, or large outputs. `.gitignore` covers normal locations but does not inspect arbitrary file content. Review `git diff --cached` before committing. Source configurations deliberately contain no credentials and do not assume unverified archive availability.
 
 The fixture is not NYISO or NOAA data and supports no research conclusions. No software license has been selected yet; choose one before inviting external reuse.
+
+## Forecast timing safeguards
+
+`src/validation/availability.py` implements the contract's timing conventions:
+
+- `forecast_targets(origins, horizon_hours)` constructs explicit UTC target boundaries for horizons 1 and 24, measured to interval end. Origins must be unique, timezone-aware, and on an exact hour boundary.
+- `validate_availability(frame, kind=...)` checks load, observed-weather, or issued-weather-forecast records against each forecast origin. Availability must be explicit and no later than issuance. Future weather forecast valid times are allowed; future observations and unpublished inputs are rejected.
+
+These are reusable checks, not a completed feature pipeline. They do not establish historical availability, choose an eligible forecast run, align weather to targets, or resolve source publication delays. Apply audited delay rules before calling them; do not substitute retrieval timestamps for historical availability.

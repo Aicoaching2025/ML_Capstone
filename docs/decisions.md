@@ -8,4 +8,6 @@
 | 2026-11-01 | Do not select a forecast provider or assume publication delays yet | Requires source pilot | No |
 | 2026-11-01 | Databricks smoke test uses managed volume and dedicated setup table | Avoid legacy DBFS assumptions and isolate test objects | No |
 
+| 2026-11-01 | Require explicit timezone-aware availability timestamps in timing validation | Reject unavailable inputs without inventing source delays; preserve elapsed-hour horizons across DST | No |
+
 Record subsequent changes, rationale, affected experiments, and whether final-holdout performance was viewed.

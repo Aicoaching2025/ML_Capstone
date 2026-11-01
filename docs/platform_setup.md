@@ -10,12 +10,12 @@ Open Terminal and run:
 
 ```bash
 cd /Users/candace/Documents/ChatGPT/ML_Capstone
-uv sync --locked --python 3.12uv
+uv sync --locked --python 3.12
 uv run pytest
 uv run python scripts/local_smoke.py
 ```
 
-Expected: four tests pass, then a JSON record with `status: passed`, 48 rows, total load 295200.0 MW (a diagnostic sum, not energy), mean load 6150.0 MW, and maximum 7300.0 MW. The generated evidence records actual package versions. No remote HTTP request occurs in this smoke test.
+Expected: all tests pass, then a JSON record with `status: passed`, 48 rows, total load 295200.0 MW (a diagnostic sum, not energy), mean load 6150.0 MW, and maximum 7300.0 MW. The generated evidence records actual package versions. No remote HTTP request occurs in this smoke test.
 
 ## Publish to GitHub
 
@@ -157,7 +157,7 @@ If a source domain is blocked in Free Edition, download locally using the review
 ## Completion checklist
 
 - [ ] Local locked installation succeeds on the intended machine.
-- [ ] Four validation tests and local smoke test pass.
+- [ ] All validation tests and local smoke test pass.
 - [ ] GitHub repository contains reviewed code/configuration/fixtures and has no raw data or secrets.
 - [ ] GitHub Actions passes, or a concrete policy limitation is recorded.
 - [ ] Databricks reads the identical hashed sample.
