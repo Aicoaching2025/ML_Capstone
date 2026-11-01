@@ -3,7 +3,7 @@
 **Project:** NYC Zone J electricity load forecasting  
 **Researcher:** Candace Grant  
 **Created:** November 1, 2026  
-**Status:** Initial inventory; production sources have not yet passed pilot audits.
+**Status:** NYISO load pilot acquired and structurally audited; NOAA and forecast sources remain pending.
 
 This inventory records intended sources and the evidence needed before using them in forecasting experiments. It complements [the research contract](research_contract.md) and `configs/sources.yaml`. It does not establish that an archive has complete coverage or that a historical input was available at a forecast origin.
 
@@ -21,86 +21,67 @@ Unknown details are deliberately marked **Unresolved — requires audit**. Repla
 
 ## NYISO hourly load
 
+**Pilot audit:** November 1, 2026. See [the full audit](nyiso_load_pilot_audit.md).
+
 | Field | Current specification or audit requirement |
 | --- | --- |
-| Provider | NYISO; planned source |
-| Product | Integrated Real-Time Actual Load; planned hourly target product |
-| Role | Target variable and eligible historical load predictors |
-| Discovery URL | <https://oasis.nyiso.com/> |
-| Candidate archive index | <https://mis.nyiso.com/public/P-58Clist.htm>; inspect and verify pilot files before approving acquisition |
-| Exact downloadable archive URLs | Unresolved — requires audit. Record each actual file URL in the download manifest; an index URL is not a file URL. |
-| Geography | Zone J, New York City; planned scope |
-| Exact source zone identifier | Unresolved — requires audit. Preserve the actual label/code and evidence mapping it to Zone J. |
-| Units | MW under the research contract; verify the source field and hourly integrated definition. Do not silently substitute energy in MWh. |
-| Source column names | Unresolved — requires audit |
-| Interval labels | Unresolved — requires audit. Determine whether the timestamp denotes interval start, interval end, or another convention. |
-| Source timezone | Unresolved — requires audit. Inspect timestamp and timezone/offset fields and official documentation. |
-| DST behavior | Unresolved — requires audit. Examine spring and fall transitions before converting to UTC. |
-| Revision policy and vintage | Unresolved — requires audit. Determine whether downloaded records are preliminary, revised, or final and whether prior vintages can be recovered. |
-| Publication timing | Unresolved — requires audit. Distinguish interval completion, first publication, and subsequent revision. |
-| Predictor availability rule | Unresolved — requires audit. Establish an evidence-based delay or explicitly labeled conservative assumption. |
-| Requested historical coverage | 2018–2025, NYC local calendar dates; planned scope |
-| Actual coverage | Unresolved — requires audit; report gaps and exclusions |
-| Pilot periods | January 15–21, March 9–11, and November 2–4, 2024; planned inspection windows |
-| Format and access method | Unresolved — requires audit; preserve original files and archive membership |
-| Usage and redistribution terms | Unresolved — requires audit; record official terms and attribution requirements |
-| Audit evidence | Pending: downloaded pilot, manifest rows, metadata notes, UTC/DST audit, and load plot |
-| Approval status | Planned; not approved for full-period acquisition |
+| Provider/product | NYISO Integrated Real-Time Actual Load, P-58C / palIntegrated; pilot acquired |
+| Role | Hourly target and, after availability rules are resolved, historical load predictors |
+| Official archive index | <https://mis.nyiso.com/public/P-58Clist.htm> |
+| Exact downloadable URLs | January/March/November 2024 URLs recorded in `data/manifests/downloads.csv` |
+| Geography and source identifiers | Zone J, NYC; source label `N.Y.C.`, PTID `61761`; observed throughout pilot and checked against NYISO mapping |
+| Source columns | `Time Stamp`, `Time Zone`, `Name`, `PTID`, `Integrated Load` |
+| Units | MW under the time-weighted hourly-power interpretation; source CSV itself has no units field |
+| Source timestamp | `MM/DD/YYYY HH:MM:SS`; explicit EST/EDT field |
+| Source timezone | NYC daylight-observing local time; offsets checked against America/New_York |
+| Interval label | Supported hour-start interpretation from five-minute numerical cross-check and GridStatus implementation; not explicit provider CSV-schema confirmation |
+| DST behavior | March 10 has 23 NYC rows; November 3 has 25. Repeated 01:00 retained with different offsets. |
+| Requested study coverage | 2018–2025 planned; not yet acquired |
+| Acquired coverage | Three full months: January, March, November 2024; 2,208 NYC records |
+| Selected pilot windows | January 15–21 (168 hours); March 9–11 (71); November 2–4 (73); 312 total |
+| Completeness | No missing NYC UTC hours in the three months; no duplicate zone/UTC keys; no missing/nonfinite/nonpositive selected target values |
+| Revisions and vintages | Unresolved — archives are current retrieved versions, without historical first-publication or revision timestamps |
+| Publication timing | NYISO guide says posted after each hour; precise historical delay remains unresolved |
+| Predictor availability rule | Unresolved — do not assign availability from retrieval or interval end automatically |
+| Format/access | HTTPS ZIP archives containing daily CSVs; immutable originals and extraction lineage retained |
+| Usage and redistribution terms | Unresolved — review before public raw-data redistribution; raw files remain out of Git |
+| Audit evidence | Pilot report, download/member manifests, scripts, strict parser tests, Silver pilot, generated plots/count tables |
+| Approval status | Pilot structural/DST checks passed; full-history acquisition not approved |
 
-### Load acceptance criteria
+### Remaining load decisions
 
-- Confirm the hourly integrated product rather than silently using five-minute actual load.
-- Verify the source identifier for Zone J, numerical units, and interval boundaries.
-- Preserve original timestamps and resolve both DST transitions without losing distinct intervals.
-- Quantify missing and duplicate records; investigate unusual values before excluding them.
-- Document publication-delay and revision limitations before engineering load features.
+- Preserve the evidence qualification on hour-start interpretation; amend if an explicit provider schema becomes available.
+- Resolve publication-delay and revision assumptions before engineering predictive lags.
+- The January window includes MLK Day; it is a winter inspection window, not a fully ordinary nonholiday week.
+- Verify full-history coverage and source terms before expanding acquisition or redistributing data.
 
 ## NOAA observed weather
 
-| Field | Current specification or audit requirement |
+**Status:** Step 5 observed-weather pilot complete. [Full report](noaa_weather_pilot_audit.md); exact rules in `configs/weather_pilot.yaml`.
+
+| Field | Established pilot specification |
 | --- | --- |
-| Provider | NOAA National Centers for Environmental Information; planned source |
-| Dataset | Local Climatological Data version 2; planned dataset, verify actual download version |
-| Discovery and documentation entry point | <https://www.ncei.noaa.gov/products/land-based-station/local-climatological-data> |
-| Exact download URLs | Unresolved — requires audit; record per-file URLs in the manifest |
-| Role | Eligible observed weather history, retrospective event labels, and separately labeled future-observed-weather sensitivity experiment |
-| Primary station candidate | Central Park; selection remains conditional on coverage and relevance |
-| Backup station candidates | LaGuardia and JFK; compare before choosing a substitution rule |
-| Exact station identifiers | Unresolved — requires audit. Record the identifier used by the selected dataset version, not just a station name or identifier from another system. |
-| Coordinates and elevation | Unresolved — requires audit; record latitude, longitude, coordinate convention, elevation, and source metadata |
-| Variables | Planned: temperature, dew point, relative humidity, wind speed, and precipitation where suitable |
-| Exact field names and units | Unresolved — requires audit for each variable; preserve source units and document conversion |
-| Quality flags | Unresolved — requires audit. Identify flags, missing-value codes, trace precipitation, and excluded observation types. |
-| Timestamp convention | Unresolved — requires audit. Determine UTC, fixed local standard time, or daylight-observing local time for the exact downloaded product. |
-| Observation timing within each hour | Unresolved — requires audit. Identify routine/special reports and multiple records per hour. |
-| Hourly selection or aggregation | Unresolved — requires audit. Specify a causal rule for predictors and a documented rule for retrospective interval summaries. |
-| Observation availability delay | Unresolved — requires audit; do not equate observation time with public availability automatically |
-| Missingness and station substitution | Unresolved — requires audit by variable and period; preserve contributing station identity |
-| Requested coverage | Same load pilot windows, followed by approved 2018–2025 coverage |
-| Actual station/variable coverage | Unresolved — requires audit |
-| Usage and redistribution terms | Unresolved — requires audit; record attribution and source terms |
-| Audit evidence | Pending: station metadata, pilot files, manifest rows, variable dictionary, missingness and station-comparison outputs |
-| Approval status | Planned; station selection and full-period acquisition pending |
-
-### Station metadata register
-
-| Candidate | Exact dataset station ID | Latitude | Longitude | Elevation and units | Metadata evidence | Pilot status |
-| --- | --- | --- | --- | --- | --- | --- |
-| Central Park | Unresolved | Unresolved | Unresolved | Unresolved | Pending | Not acquired |
-| LaGuardia | Unresolved | Unresolved | Unresolved | Unresolved | Pending | Not acquired |
-| JFK | Unresolved | Unresolved | Unresolved | Unresolved | Pending | Not acquired |
-
-### Weather variable register
-
-| Variable | Source field | Source units | Analysis units | Flags and missing codes | Hourly rule |
-| --- | --- | --- | --- | --- | --- |
-| Air temperature | Unresolved | Unresolved | Degrees Celsius | Unresolved | Unresolved |
-| Dew point | Unresolved | Unresolved | Degrees Celsius | Unresolved | Unresolved |
-| Relative humidity | Unresolved | Unresolved | Percent | Unresolved | Unresolved |
-| Wind speed | Unresolved | Unresolved | Metres per second | Unresolved | Unresolved |
-| Precipitation | Unresolved | Unresolved | Millimetres with explicit accumulation interval | Unresolved | Unresolved |
-
-Heating/cooling degree-hours are derived features, not an additional source. Their initial reference is 18.3°C under the research contract. Future observed weather must remain separate from operational predictors.
+| Provider and dataset | NOAA NCEI LCD v2; user-supplied 2024 station-year CSVs |
+| Source page | <https://www.ncei.noaa.gov/products/land-based-station/local-climatological-data> |
+| Primary | Central Park, USW00094728, KNYC; latitude 40.77898, longitude -73.96925 |
+| First backup | LaGuardia, USW00014732, KLGA; latitude 40.7792, longitude -73.88 |
+| Second backup | JFK, USW00094789, KJFK; latitude 40.6386, longitude -73.7622 |
+| Units | Temperature/dew point C, humidity %, wind m/s, precipitation mm under bulk LCDv2 metric specification |
+| Report selection | Routine FM-15 only for this pilot; preserve other types in Bronze |
+| Canonical timestamp | Original station-matched METAR UTC token, DATE used only for nearby month/year context |
+| Timestamp exceptions | Preserve DATE discrepancies; quarantine unmatched UTC tokens without guessed offset fallback |
+| Hourly selection | Latest observation strictly inside half-open UTC hour; point representative, not mean |
+| Primary core variables | HourlyDryBulbTemperature, HourlyDewPointTemperature, HourlyRelativeHumidity |
+| Optional variables | HourlyWindSpeed, HourlyPrecipitation; missing wind remains missing; trace separate from zero |
+| Quality handling | Raw tokens, source and remarks retained; documented numeric sanity checks; no full upstream-QC certification |
+| Missingness and fallback | No temporal imputation. Complete same-interval core tuple: Central Park, then LGA, then JFK; preserve station identity |
+| Pilot result | 936 station-hour rows; 312 primary and load-aligned rows; no missing core tuple; zero fallback hours |
+| Source files and provenance | Immutable copies in data/bronze/noaa/lcdv2; hashes in downloads.csv; project intake sidecars |
+| Original URL and download time | Unknown for supplied files; not invented. Candidate source page is not presented as verified exact download URL. |
+| Publication delay | Unresolved; Step 7. No origin-eligible forecast features created. |
+| Elevation | Preserved raw; documentation has inconsistent elevation-unit descriptions; not used |
+| Full-history readiness | Pending unmatched-message review and eight-year coverage audit; no annual completeness claim |
+| Source terms | Review before public raw-data redistribution; raw files remain excluded from Git |
 
 ## Archived issued weather forecasts
 

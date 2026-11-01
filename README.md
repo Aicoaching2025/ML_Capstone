@@ -6,7 +6,7 @@ This project studies NYISO Zone J hourly electricity demand at rolling 1-hour an
 
 ## Current status
 
-The local project scaffold, dependency lockfile, synthetic sample, validation checks, forecast-timing safeguards, and Databricks smoke notebook are prepared. Real data acquisition and forecasting experiments have not begun. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
+The local project scaffold, dependency lockfile, synthetic sample, validation checks, forecast-timing safeguards, and Databricks smoke notebook are prepared. A 2024 NYISO pilot has now been acquired and structurally audited; forecasting experiments have not begun. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
 
 ## Local setup
 
@@ -51,3 +51,26 @@ The fixture is not NYISO or NOAA data and supports no research conclusions. No s
 - `validate_availability(frame, kind=...)` checks load, observed-weather, or issued-weather-forecast records against each forecast origin. Availability must be explicit and no later than issuance. Future weather forecast valid times are allowed; future observations and unpublished inputs are rejected.
 
 These are reusable checks, not a completed feature pipeline. They do not establish historical availability, choose an eligible forecast run, align weather to targets, or resolve source publication delays. Apply audited delay rules before calling them; do not substitute retrieval timestamps for historical availability.
+
+## Stage 4 NYISO load pilot
+
+The three requested monthly archives and 312 selected NYC intervals have been acquired and structurally audited. See [the pilot audit](docs/nyiso_load_pilot_audit.md) for DST findings, timing evidence, hashes, plots, and unresolved publication/revision assumptions. Raw data and generated outputs remain local and ignored by Git.
+
+```bash
+uv sync --locked --python 3.12
+uv run python scripts/acquire_nyiso_pilot.py
+uv run python scripts/acquire_nyiso_timing_check.py
+uv run python scripts/audit_nyiso_pilot.py
+```
+
+Downloads occur only when originals are absent. The offline audit reruns against the cached pilot.
+
+## Step 5 observed-weather pilot
+
+The reviewed observed-weather pilot is complete. See [the weather report](docs/noaa_weather_pilot_audit.md) and `configs/weather_pilot.yaml`. Rebuild locally with:
+
+```bash
+uv run python scripts/build_weather_pilot.py
+```
+
+It uses preserved 2024 NOAA files and the existing NYISO pilot. Outputs under `data/silver/noaa` are retrospective hourly observations, not weather forecasts or origin-available features. Historical reporting delay remains a later availability question.

@@ -23,3 +23,5 @@ data/silver/*
 outputs/data_audit/*
 !outputs/data_audit/.gitkeep
 .ipynb_checkpoints/
+
+.mplconfig/

@@ -2,7 +2,7 @@
 
 ## Setup status
 
-Only a synthetic 48-row fixture has been prepared. Real NYISO and NOAA data have not been acquired or audited.
+The synthetic setup fixture is verified. A real 2024 NYISO load pilot has now been acquired and structurally audited; NOAA and archived forecast-weather pilots remain pending. Earlier entries below describe their status at that time.
 
 The local smoke test checks UTC interval consistency, uniqueness, hourly continuity, zone, numeric validity, positive synthetic load, and a CSV-to-Parquet round trip. Unit checks verify DST behavior and rejection of malformed intervals and duplicate rows.
 
@@ -42,3 +42,18 @@ The exported JSON evidence and transformed CSV were downloaded and verified loca
 
 This verifies the synthetic cross-platform smoke test only. Real NYISO and NOAA data quality, forecast availability, and forecasting performance remain unverified.
 ```
+## NYISO load pilot audit on November 1 2026
+
+Three official monthly hourly archives (January, March, November 2024) were downloaded with actual retrieval timestamps, SHA-256 hashes, and archive/member lineage. They contain 2,208 NYC hours; the selected windows contain 312 hours (168 winter, 71 spring-DST, 73 fall-DST). No NYC UTC gaps or duplicate intervals were found in those months, and selected load values contain no missing/nonfinite/nonpositive values. No data were imputed or excluded.
+
+The source label is N.Y.C., PTID 61761. Explicit EST/EDT labels preserve the 23-hour spring day and 25-hour fall day. Hour-start labeling is supported by an official five-minute numerical cross-check and the GridStatus implementation; an explicit NYISO CSV-schema statement was not obtained. Exact historical publication delays, original revision vintages, and redistribution terms remain unresolved. No forecasting lags were constructed and no 2025 data were accessed.
+
+The suite contains 20 passing tests after adding four strict NYISO parser tests. Existing availability tests emit dependency deprecation warnings; no failures occurred. See [the full audit](nyiso_load_pilot_audit.md) for evidence, plots, limitations, and reproduction commands.
+
+## NOAA weather intake audit on November 1 2026
+
+Three user-supplied LCDv2 2024 files for the intended stations were copied unchanged into Bronze and hashed. Actual project intake times are recorded separately; original download URLs/times remain unknown. The diagnostic audit recovered original METAR UTC times and found ten fixed-EST conversion discrepancies per station near DST. All stations cover 312 diagnostic pilot-hour bins with no missing temperature/dew point/humidity; Central Park has 34 missing wind values. Precipitation trace tokens are preserved and not treated as measured zeros. No production weather/load join or availability timestamp was created. All 24 tests pass. See [the weather intake audit](noaa_weather_pilot_audit.md) for remaining decisions.
+
+## Step 5 observed-weather pilot completion on November 1 2026
+
+Frozen configuration and the offline build now produce 936 station-hour representatives, 312 Central Park primary records, and 312 one-to-one retrospective load/weather matches with no missing core temperature/dew point/humidity tuple or fallback. Original METAR UTC resolves pilot DATE discrepancies; unmatched annual records remain quarantined. Central Park's 34 missing wind values remain missing, and precipitation traces are distinct from zero. No imputation or operational feature availability was fabricated. All 27 tests pass. See the weather pilot audit for completed policies, source limitations, and later-stage tasks.

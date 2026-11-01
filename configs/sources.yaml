@@ -1,18 +1,67 @@
-# Discovery locations, not yet validated download endpoints.
 load:
   provider: NYISO
   product: Integrated Real-Time Actual Load
   discovery_url: https://oasis.nyiso.com/
   zone: J
-  status: pending_source_audit
+  status: pilot_structural_and_dst_audit_passed
+  archive_index_url: https://mis.nyiso.com/public/P-58Clist.htm
+  archive_url_template: https://mis.nyiso.com/public/csv/palIntegrated/{yyyymm}01palIntegrated_csv.zip
+  source_name: N.Y.C.
+  source_ptid: 61761
+  source_columns:
+  - Time Stamp
+  - Time Zone
+  - Name
+  - PTID
+  - Integrated Load
+  units_interpretation: MW time-weighted hourly average; source CSV has no units field
+  source_timezone: America/New_York with explicit EST/EDT labels
+  timestamp_format: '%m/%d/%Y %H:%M:%S'
+  interval_label: start
+  interval_label_evidence: Empirical January 2024 five-minute alignment check and
+    GridStatus reference implementation; not explicit provider CSV schema confirmation
+  pilot_months:
+  - 2024-01
+  - 2024-03
+  - 2024-11
+  publication_delay_hours: null
+  historical_revision_vintages: null
+  audit_report: docs/nyiso_load_pilot_audit.md
+  full_history_acquisition_approved: false
 observations:
   provider: NOAA NCEI
   product: LCD v2
   discovery_url: https://www.ncei.noaa.gov/products/land-based-station/local-climatological-data
   primary_station_candidate: Central Park
-  backup_station_candidates: [LaGuardia, JFK]
-  station_identifiers: null
-  status: pending_source_audit
+  backup_station_candidates:
+  - LaGuardia
+  - JFK
+  station_identifiers:
+    Central Park: USW00094728
+    LaGuardia: USW00014732
+    JFK: USW00094789
+  status: step_5_observed_weather_pilot_complete
+  audit_report: docs/noaa_weather_pilot_audit.md
+  source_timezone_policy: Original station-matched METAR UTC token is canonical; DATE
+    supplies month context only; unmatched messages quarantined
+  original_download_urls_verified: false
+  publication_delay_hours: null
+  primary_station: USW00094728
+  backup_priority:
+  - USW00014732
+  - USW00094789
+  hourly_rule: Latest FM15 observation within each half-open UTC interval; representative
+    measurement, not mean or origin-known feature
+  quality_rule: Raw tokens/source/remarks retained; invalid numeric sanity checks
+    become missing with state; no full upstream-QC certification
+  missingness_rule: No temporal imputation; complete core tuple fallback Central Park
+    then LaGuardia then JFK within same interval; keep selected station identity
+  wind_rule: Keep selected station wind, missing remains missing; optional feature
+  precipitation_rule: Numeric mm plus distinct trace indicator; trace numeric remains
+    missing; no overlapping-report sum
+  pilot_config: configs/weather_pilot.yaml
+  silver_primary: data/silver/noaa/weather_pilot_primary_2024.parquet
+  operational_origin_features_approved: false
 forecast_weather:
   provider: null
   model: null

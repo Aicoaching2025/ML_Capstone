@@ -1,0 +1,24 @@
+version: 1
+scope: observed_weather_pilot_2024_only
+stations:
+  USW00094728: {name: Central Park, icao: KNYC}
+  USW00014732: {name: LaGuardia, icao: KLGA}
+  USW00094789: {name: JFK, icao: KJFK}
+primary_station: USW00094728
+backup_priority: [USW00014732, USW00094789]
+report_type: FM-15
+utc_rule: original_station_matched_METAR_DDHHMMZ_with_nearest_month_context
+unmatched_time_rule: quarantine_no_DATE_offset_fallback
+hourly_rule: latest_routine_observation_inside_half_open_UTC_hour
+core_features: [temperature_c, dewpoint_c, relative_humidity_pct]
+core_backup_rule: complete_tuple_same_interval_primary_then_LGA_then_JFK
+wind_rule: preserve_selected_station_value_missing_stays_missing_optional_feature
+precipitation_rule: numeric_mm_and_separate_trace_indicator_no_summing_no_imputation
+quality_rule: preserve_raw_tokens_source_and_remarks_plus_sanity_flags_not_full_upstream_QC
+imputation: none
+publication_delay_hours: null
+operational_origin_features_approved: false
+windows:
+  winter: ["2024-01-15", "2024-01-22"]
+  spring_dst: ["2024-03-09", "2024-03-12"]
+  fall_dst: ["2024-11-02", "2024-11-05"]
