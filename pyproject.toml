@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nyc-load-capstone"
+version = "0.1.0"
+description = "Leakage-controlled NYC Zone J hourly load forecasting research"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "pandas>=2.2,<3",
+  "numpy>=2,<3",
+  "pyarrow>=18,<25",
+  "httpx>=0.28,<1",
+  "PyYAML>=6,<7",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acquisition", "src/cleaning", "src/validation"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

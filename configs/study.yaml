@@ -1,0 +1,17 @@
+contract_version: "0.1"
+timezone_storage: UTC
+timezone_calendar: America/New_York
+study_start_local: "2018-01-01"
+study_end_local_exclusive: "2026-01-01"
+holdout_year: 2025
+horizons_hours: [1, 24]
+horizon_anchor: target_interval_end
+interval_closed: left
+zone: J
+units: MW
+load_publication_delay_hours: null  # Unresolved; audit before feature generation.
+weather_release_delay_hours: null  # Unresolved; provider-dependent.
+operational_weather_start: null
+operational_weather_end: null
+primary_metrics: [MAE, RMSE]
+optional_lstm: true

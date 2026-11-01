@@ -1,0 +1,8 @@
+{
+  "fixture": "synthetic, not research data",
+  "rows": 48,
+  "total_load_mw": 295200.0,
+  "mean_load_mw": 6150.0,
+  "max_load_mw": 7300.0,
+  "sample_sha256": "1eb441a7209fab2e1188384f9ad4667ac94d179c5d3a01c86fd09792aab8ddad"
+}

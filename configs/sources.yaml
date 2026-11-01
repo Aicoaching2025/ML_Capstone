@@ -1,0 +1,19 @@
+# Discovery locations, not yet validated download endpoints.
+load:
+  provider: NYISO
+  product: Integrated Real-Time Actual Load
+  discovery_url: https://oasis.nyiso.com/
+  zone: J
+  status: pending_source_audit
+observations:
+  provider: NOAA NCEI
+  product: LCD v2
+  discovery_url: https://www.ncei.noaa.gov/products/land-based-station/local-climatological-data
+  primary_station_candidate: Central Park
+  backup_station_candidates: [LaGuardia, JFK]
+  station_identifiers: null
+  status: pending_source_audit
+forecast_weather:
+  provider: null
+  model: null
+  status: pending_archive_pilot
