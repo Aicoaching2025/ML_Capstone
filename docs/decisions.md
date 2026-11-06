@@ -7,7 +7,6 @@
 | 2026-11-01 | Use a synthetic fixture for platform smoke tests | Verify infrastructure without implying real-data validation | No |
 | 2026-11-01 | Do not select a forecast provider or assume publication delays yet | Requires source pilot | No |
 | 2026-11-01 | Databricks smoke test uses managed volume and dedicated setup table | Avoid legacy DBFS assumptions and isolate test objects | No |
-
 | 2026-11-01 | Require explicit timezone-aware availability timestamps in timing validation | Reject unavailable inputs without inventing source delays; preserve elapsed-hour horizons across DST | No |
 
 Record subsequent changes, rationale, affected experiments, and whether final-holdout performance was viewed.
@@ -42,3 +41,18 @@ Record subsequent changes, rationale, affected experiments, and whether final-ho
 - Preserve source/remarks/raw scalar states and apply documented broad sanity checks, without claiming complete upstream QC.
 - Build a clearly retrospective one-to-one load/weather alignment, not origin-eligible model features. Leave publication delay for Step 7.
 - Step 5 pilot is complete; full-year unresolved-message recovery and original download provenance remain limitations for expansion. No model fitting or separate 2025 data access.
+
+## Amendment 1 decisions on November 6 2026
+
+| Date | Decision | Rationale | Holdout errors viewed |
+| --- | --- | --- | --- |
+| 2026-11-06 | Freeze revised proposal as contract v0.2 (Amendment 1) | Align configs, contract, and proposal before full-history work | No |
+| 2026-11-06 | Load usable at O only through the interval ending O - 1h; zero-delay sensitivity | Live P-58B posting lagged about 15-20 min; historical delay unverifiable | No |
+| 2026-11-06 | Origin-relative lags; 24-hour daily naive uses a 48-hour shift | t-1 (1 h) and t-24 (24 h) are unavailable under the load rule | No |
+| 2026-11-06 | Observed weather usable if logged at least 15 min before O; zero-minute sensitivity | No published NCEI dissemination times | No |
+| 2026-11-06 | Forecast weather: Open-Meteo GFS previous_day2, all weather variables, 2024-2025 | previous_day1 can postdate a 24-hour origin; fixed-lead archives start in 2024 | No |
+| 2026-11-06 | 24-hour observed-weather results labeled an ideal-information reference | Future observations are not available at O | No |
+| 2026-11-06 | Add NYISO P-7 day-ahead forecast as 24-hour benchmark | Operational comparison point | No |
+| 2026-11-06 | Test years 2021-2024; holdout 2025; 2017 warm-up only | Expanding window by year | No |
+| 2026-11-06 | SARIMAX on trailing two-year windows; LSTM deferred; DM tests for primary comparisons only | Protect schedule | No |
+| 2026-11-06 | Approve full-history acquisition via per-file downloads | Bulk archives were too large and failed | No |

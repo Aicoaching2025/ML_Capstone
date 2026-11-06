@@ -4,8 +4,9 @@ Comparative machine learning for hour-ahead and 24-hour-ahead electricity demand
 
 **Researcher:** Candace Grant  
 **Course:** DATA 698, Fall 2026  
-**Contract version:** 0.1  
+**Contract version:** 0.2  
 **Created:** November 1, 2026  
+**Amended:** November 6, 2026 (Amendment 1, below)  
 **Status:** Initial research specification; source-dependent availability assumptions must pass the data audit before experiments are frozen.
 
 ## Purpose and scope
@@ -14,7 +15,7 @@ This study compares forecasts of NYISO Load Zone J electricity demand using load
 
 The core contribution is a reproducible comparison under explicit information-availability constraints. A finding that a complex model does not outperform a baseline is a valid research result. Statistical significance or a particular winning model is not a completion requirement.
 
-The core project includes seasonal-naïve baselines, SARIMAX, Random Forest, XGBoost, chronological validation, feature ablations, and extreme-event evaluation. An LSTM is optional and must not delay the core deliverables. No production serving system or operational cost optimization is required.
+The core project includes seasonal-naïve baselines, SARIMAX, Random Forest, XGBoost, chronological validation, feature ablations, and extreme-event evaluation. An LSTM is deferred to future work under Amendment 1. No production serving system or operational cost optimization is required.
 
 ## Research questions and hypotheses
 
@@ -152,9 +153,9 @@ An archive containing stitched near-current forecasts, observations, or reanalys
 | --- | --- | --- |
 | Hourly load | NYISO integrated real-time actual load, Zone J | Product identity, timestamps, units, revisions, coverage |
 | Observed weather | NOAA NCEI LCD v2; Central Park primary candidate, LaGuardia/JFK alternatives | Station metadata, time convention, quality flags, variable coverage |
-| Forecast weather | Provider and operational model selected after archive pilot | Vintage semantics, release delay, lead coverage, variables, licensing |
+| Forecast weather | Open-Meteo Previous Runs API, NCEP GFS, 48-hour offset (Amendment 1) | Vintage semantics, release delay, lead coverage, variables, licensing |
 | Calendar | Deterministic NYC calendar and documented US holidays | Timezone, holiday definitions, reproducible version |
-| Optional benchmark | Archived NYISO published load forecasts | Zone, target definition, issue time, historical vintage availability |
+| Operational benchmark | Archived NYISO ISO Load Forecast (P-7), N.Y.C. column (Amendment 1) | Zone, target definition, issue time, historical vintage availability |
 
 Two experiment periods are permitted:
 
@@ -195,7 +196,7 @@ For each horizon, Random Forest and XGBoost use:
 
 Persistence uses the latest available load observation. Daily and weekly naïve baselines use the target interval shifted by 24 and 168 elapsed hours, respectively, only when the source value is available at the origin. If a baseline value is unavailable, its prescribed missing/fallback rule must be frozen and reported. A same-local-clock-hour baseline may be evaluated separately because DST makes it different from a fixed elapsed-hour shift.
 
-Feature candidates include recent load values, daily/weekly lags, trailing 3/24/168-hour summaries, calendar encodings, temperature, dew point, humidity, and degree-hours. Exact feature definitions and search budgets are frozen using development data. LSTM work starts only after core models and backtests are complete.
+Feature candidates include recent load values, daily/weekly lags, trailing 3/24/168-hour summaries, calendar encodings, temperature, dew point, humidity, and degree-hours. Exact feature definitions and search budgets are frozen using development data. LSTM work is deferred to future work (Amendment 1).
 
 ## Chronological validation and final holdout
 
@@ -278,3 +279,87 @@ Bucket 1 is complete when source pilots and full-period coverage are audited; UT
 The capstone is complete when the core comparisons answer RQ1–RQ3, report uncertainty and extreme-period coverage, preserve final-holdout discipline, and can be reproduced from the documented repository. Beating a baseline is a finding, not a requirement for successful research.
 
 Record amendments in `docs/decisions.md` with date, rationale, affected experiments, and whether final-holdout performance had been viewed. Preserve earlier contract versions in Git. Source feasibility can justify a shorter operational experiment; it cannot justify silently using future observed weather as an operational input.
+
+## Amendment 1 (November 6, 2026)
+
+**Version:** 0.2. **Holdout errors viewed before this amendment:** No. **Models fitted before this amendment:** None.
+
+This amendment freezes the protocol in the revised proposal and resolves the Bucket 1 availability decisions listed above. Where it conflicts with earlier sections, this amendment governs. Values are recorded in `configs/study.yaml` and `configs/sources.yaml`.
+
+### A1. Load availability
+
+- **Rule:** at origin `O`, the latest usable load interval ends at `O − 1 hour`. The interval ending at `O` is not usable.
+- **Evidence:** on 2026-11-06 at 18:07 EST, the live NYISO Real-Time Actual Load file (P-58B) had been updated at 18:06 EST, with its latest five-minute value at 17:50 EST. That is a posting lag of roughly 15–20 minutes, so the hour ending at `O` is not complete and posted at `O`.
+- **Limitation:** this is current behavior, used as an assumed historical delay. It is not verified for 2018–2025.
+- **Sensitivity:** a zero-delay variant is reported as a secondary analysis.
+- **Revisions:** predictors use the currently retrieved, revised vintage. This revision-related hindsight is disclosed as a limitation.
+
+### A2. Origin-relative load features
+
+`L_k` is the load for the interval ending at `O − k` hours. It is usable only when `k ≥ 1`.
+
+| Horizon | Lags (origin-relative) | Target-relative equivalent | Rolling windows |
+| --- | --- | --- | --- |
+| 1 hour | L1, L2, L23, L47, L167 | t−2, t−3, t−24, t−48, t−168 | 3, 24, 168 h ending at L1 |
+| 24 hours | L1, L24, L144 | t−25, t−48, t−168 | 3, 24, 168 h ending at L1 |
+
+The target-relative lag t−1 is unavailable at 1 hour, and t−24 is unavailable at 24 hours. The proposal's lag list is amended accordingly.
+
+### A3. Baselines
+
+- **Persistence:** `L1`.
+- **Daily seasonal naïve:**
+  - 1-hour horizon: target shifted by 24 elapsed hours.
+  - 24-hour horizon: target shifted by **48** elapsed hours, because the 24-hour shift ends at `O` and is unavailable.
+- **Weekly seasonal naïve:** target shifted by 168 elapsed hours at both horizons.
+- **SARIMAX:** regression with ARIMA errors and daily and weekly Fourier terms. It is fitted on a trailing two-year window in each fold. Orders are selected once on pre-2021 training data and then fixed. Exogenous weather inputs follow the same availability rules as the ML models.
+
+### A4. Observed-weather availability
+
+- **Rule:** a routine FM-15 observation is usable at `O` only if its recovered UTC observation time is at least 15 minutes before `O`. For example, at an origin of 14:00 UTC, the 12:51 report is usable and the 13:51 report is not.
+- **Basis:** the 15-minute delay is assumed, since NCEI does not publish historical dissemination times.
+- **Sensitivity:** a zero-minute variant is reported as a secondary analysis.
+- **Other rules:** the station, hourly-selection, and backup rules remain those frozen in `configs/weather_pilot.yaml`, extended from 2024 to 2017–2025.
+
+### A5. Feature sets and weather experiments
+
+| Set | Horizon | Contents | Period | Status |
+| --- | --- | --- | --- | --- |
+| A | Both | Load history usable at `O` | 2018–2025 | Operational |
+| B | Both | A plus target calendar | 2018–2025 | Operational |
+| C operational | 1 hour | B plus observed weather usable at `O` (A4) | 2018–2025 | Operational |
+| C retrospective | 24 hours | B plus observed weather for the target interval | 2018–2025 | Ideal-information reference, not operational |
+| C operational | 24 hours | The C-retrospective model, scored with archived forecast weather for the target interval | 2024–2025 | Operational |
+
+For the 24-hour operational weather experiment:
+
+- **Source:** the forecast weather is Open-Meteo Previous Runs API data from model `ncep_gfs_global` at the `previous_day2` offset (the value predicted 48 hours before valid time) for Central Park.
+- **Variables:** temperature, dew point, relative humidity, wind speed, and precipitation. **All** weather inputs are replaced, not temperature alone.
+- **Why `previous_day1` is excluded:** it is the value predicted 24 hours before valid time. For a target ending at `O + 24 hours`, that run may be initialized at or after `O` and published hours later, so it is not usable at `O`.
+- **Availability basis:** the provider does not state the exact initialization time behind each offset, so availability is recorded as assumed.
+- **Scoring periods:**
+  - 2024 serves as the development fold.
+  - 2025 is scored once, in the final holdout.
+  - C retrospective and C operational are compared on identical target intervals.
+- **Excluded archives:** archives stitched from the first hours of successive runs are not used as forecast weather.
+
+### A6. Operational benchmark
+
+NYISO's ISO Load Forecast (P-7), N.Y.C. column, is the 24-hour benchmark. For each target interval, the forecast comes from the file issued on the local day before the target's local day. It is scored on the same targets and folds as the models. It is not used as a model input.
+
+### A7. Validation, comparisons, and scope
+
+- **Initial training:** 2018–2020.
+- **Expanding-window test years:** 2021, 2022, 2023, and 2024.
+- **Final holdout:** 2025, scored once after all choices are frozen.
+- **Warm-up data:** 2017 data are used only for lag and rolling warm-up and are never scored.
+- **Primary comparisons:** Diebold–Mariano tests are run for:
+  - the best ML model vs. weekly seasonal naïve (both horizons)
+  - the best ML model vs. SARIMAX (both horizons)
+  - the best ML model vs. NYISO (24 hours)
+- **Primary ML feature sets:** the best ML model is selected from operational feature sets only. That means C operational at 1 hour. At 24 hours, it is B for 2021–2025 and C operational for 2024–2025.
+- **Other models:** Random Forest is a tuned reference. The LSTM is deferred.
+
+### A8. Acquisition
+
+Full-history acquisition (2017–2025) is approved. NOAA data are downloaded as per-station-year LCD v2 CSV files, and NYISO data as monthly ZIP archives. Each file has its source URL, retrieval timestamp, and SHA-256 hash recorded in `data/manifests/downloads.csv`. Bulk multi-station archives are not used.
