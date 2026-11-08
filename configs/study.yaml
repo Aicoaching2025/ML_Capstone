@@ -1,17 +1,48 @@
-contract_version: "0.1"
+contract_version: "0.2"  # Amendment 1, 2026-11-06; see docs/research_contract.md
 timezone_storage: UTC
 timezone_calendar: America/New_York
 study_start_local: "2018-01-01"
 study_end_local_exclusive: "2026-01-01"
+warmup_start_local: "2017-01-01"  # Lag/rolling warm-up only; never scored
 holdout_year: 2025
+initial_training_years: [2018, 2019, 2020]
+validation_test_years: [2021, 2022, 2023, 2024]  # Expanding window by year
 horizons_hours: [1, 24]
 horizon_anchor: target_interval_end
 interval_closed: left
 zone: J
 units: MW
-load_publication_delay_hours: null  # Unresolved; audit before feature generation.
-weather_release_delay_hours: null  # Unresolved; provider-dependent.
-operational_weather_start: null
-operational_weather_end: null
+
+# Availability assumptions (Amendment 1). Assumed, not verified historical publication times.
+load_publication_delay_hours: 1  # Latest usable load interval ends at O - 1h
+load_delay_sensitivity_hours: [0]
+weather_release_delay_minutes: 15  # LCD routine obs usable if logged at least 15 min before O
+weather_delay_sensitivity_minutes: [0]
+
+# Origin-relative load lags: L_k = load for the interval ending at O - k hours (k >= delay)
+load_lags_origin_relative:
+  h1: [1, 2, 23, 47, 167]   # = target-relative t-2, t-3, t-24, t-48, t-168
+  h24: [1, 24, 144]         # = target-relative t-25, t-48, t-168
+rolling_windows_hours: [3, 24, 168]  # Trailing windows ending at the latest usable interval
+
+baselines:
+  persistence: latest_usable_interval
+  daily_naive_shift_hours: {h1: 24, h24: 48}   # t-24 is unavailable at h24 under a 1h delay
+  weekly_naive_shift_hours: {h1: 168, h24: 168}
+sarimax_training_window_years: 2  # Trailing window per fold
+
+feature_sets:
+  A: load_history_available_at_origin
+  B: A_plus_target_calendar
+  C_operational_h1: B_plus_observed_weather_available_at_origin
+  C_retrospective_h24: B_plus_observed_weather_at_target  # Ideal-information reference
+  C_operational_h24: C_retrospective_model_scored_with_archived_forecast_weather
+
+operational_weather_start: "2024-01-01"
+operational_weather_end: "2025-12-31"
 primary_metrics: [MAE, RMSE]
-optional_lstm: true
+primary_comparisons:
+  - best_ml_vs_weekly_seasonal_naive
+  - best_ml_vs_sarimax
+  - best_ml_vs_nyiso_forecast_h24
+optional_lstm: false  # Deferred to future work (Amendment 1)

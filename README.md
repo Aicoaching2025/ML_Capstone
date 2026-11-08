@@ -6,7 +6,7 @@ This project studies NYISO Zone J hourly electricity demand at rolling 1-hour an
 
 ## Current status
 
-The local project scaffold, dependency lockfile, synthetic sample, validation checks, forecast-timing safeguards, and Databricks smoke notebook are prepared. A 2024 NYISO pilot has now been acquired and structurally audited; forecasting experiments have not begun. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
+The local project scaffold, dependency lockfile, synthetic sample, validation checks, forecast-timing safeguards, and Databricks smoke notebook are prepared. A 2024 NYISO pilot has now been acquired and structurally audited; forecasting experiments have not begun. **Step 6 (November 6, 2026):** the revised protocol is frozen as contract v0.2 (Amendment 1 in the research contract), and full-history acquisition is approved. Databricks execution and GitHub publication require separate verification; local success does not imply remote success.
 
 ## Local setup
 

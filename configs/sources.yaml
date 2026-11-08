@@ -24,10 +24,11 @@ load:
   - 2024-01
   - 2024-03
   - 2024-11
-  publication_delay_hours: null
+  publication_delay_hours: 1  # Assumed; live P-58B lagged about 15-20 min on 2026-11-06
   historical_revision_vintages: null
   audit_report: docs/nyiso_load_pilot_audit.md
-  full_history_acquisition_approved: false
+  full_history_acquisition_approved: true  # Amendment 1, 2026-11-06
+  full_history_months: ["2017-01", "2025-12"]  # 2017 is warm-up only
 observations:
   provider: NOAA NCEI
   product: LCD v2
@@ -44,8 +45,11 @@ observations:
   audit_report: docs/noaa_weather_pilot_audit.md
   source_timezone_policy: Original station-matched METAR UTC token is canonical; DATE
     supplies month context only; unmatched messages quarantined
-  original_download_urls_verified: false
-  publication_delay_hours: null
+  # original_download_urls_verified was false for the user-supplied 2024 pilot files
+  publication_delay_minutes: 15  # Assumed release delay for routine FM-15 observations
+  full_history_years: [2017, 2025]
+  station_year_url_template: https://www.ncei.noaa.gov/oa/local-climatological-data/v2/access/{yyyy}/LCD_{station}_{yyyy}.csv
+  original_download_urls_verified: true  # From Step 7 onward, via scripts/acquire_noaa_lcd.py
   primary_station: USW00094728
   backup_priority:
   - USW00014732
@@ -63,6 +67,33 @@ observations:
   silver_primary: data/silver/noaa/weather_pilot_primary_2024.parquet
   operational_origin_features_approved: false
 forecast_weather:
-  provider: null
-  model: null
-  status: pending_archive_pilot
+  provider: Open-Meteo
+  product: Previous Runs API
+  endpoint: https://previous-runs-api.open-meteo.com/v1/forecast
+  docs_url: https://open-meteo.com/en/docs/previous-runs-api
+  model: ncep_gfs_global
+  location: {name: Central Park, latitude: 40.77898, longitude: -73.96925}
+  variables:
+  - temperature_2m_previous_day2
+  - dew_point_2m_previous_day2
+  - relative_humidity_2m_previous_day2
+  - wind_speed_10m_previous_day2
+  - precipitation_previous_day2
+  lead_rule: previous_day2 = value predicted 48 hours before valid time
+  lead_rationale: previous_day1 (24 hours before valid time) can be issued after a 24-hour
+    origin and published hours later, so it is not available at O
+  period: ["2024-01-01", "2025-12-31"]
+  timezone: GMT
+  availability_basis: assumed; provider does not publish exact run initialization per offset
+  license: CC BY 4.0, free non-commercial API
+  status: approved_for_operational_weather_sub_study
+nyiso_forecast:
+  provider: NYISO
+  product: ISO Load Forecast (P-7)
+  archive_index_url: https://mis.nyiso.com/public/P-7list.htm
+  archive_url_template: https://mis.nyiso.com/public/csv/isolf/{yyyymm}01isolf_csv.zip
+  zone_column: N.Y.C.
+  period: ["2017-12", "2025-12"]
+  selection_rule: For each target, use the file issued on the local day before the target's local day
+  role: operational benchmark for the 24-hour horizon only
+  status: approved_pending_acquisition
