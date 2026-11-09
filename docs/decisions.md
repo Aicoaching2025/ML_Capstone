@@ -88,3 +88,11 @@ Record subsequent changes, rationale, affected experiments, and whether final-ho
 | 2026-11-08 | Holidays from pandas USFederalHolidayCalendar plus NERC subset and day after Thanksgiving | Same holidays as the holidays package; no new dependency | No |
 | 2026-11-08 | Naive baseline values stored in the tables; scored in Step 11 | Baselines pass the same availability checks | No |
 
+## Step 9 data audit decisions on November 8 2026
+
+| Date | Decision | Rationale | Holdout errors viewed |
+| --- | --- | --- | --- |
+| 2026-11-08 | 2025 audited as counts only (rows, missing hours, fallback, timestamp disagreements, quarantine); value checks and figures use 2017-2024 | Protect final holdout; code refuses 2025 rows in value checks | No |
+| 2026-11-08 | Load deviation flag = robust z > 6 against the same clock hour 1-3 days before and after; flagged hours kept | Flags heat days and holidays for review without removing real demand | No |
+| 2026-11-08 | Weather range checks flag but do not edit values | LCD routine data are not fully quality-controlled upstream; no imputation rule | No |
+| 2026-11-08 | Audit figures committed under docs/figures; row-level evidence stays in outputs/data_audit/step9 | Paper needs the figures; evidence CSVs are regenerable | No |
