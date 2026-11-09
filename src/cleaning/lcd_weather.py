@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def metar_utc(date_text,remark,icao):
-    match=re.search(r'\b(?:METAR|SPECI)\s+(?:COR\s+)?'+icao+r'\s+(?:COR\s+)?(\d{6})Z\b',remark)
+    match=re.search(r'(?<![A-Z])(?:METAR|SPECI)\s+(?:COR\s+)?'+icao+r'\s+(?:COR\s+)?(\d{6})Z\b',remark)
     if not match:return pd.NaT
     token=match.group(1);day,hour,minute=int(token[:2]),int(token[2:4]),int(token[4:6])
     if not (1<=day<=31 and hour<24 and minute<60):return pd.NaT

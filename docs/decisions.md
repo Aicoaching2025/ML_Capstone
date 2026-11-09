@@ -66,3 +66,13 @@ Record subsequent changes, rationale, affected experiments, and whether final-ho
 | 2026-11-08 | Open-Meteo GFS previous_day2 coverage begins 2024-01-20T12:00 UTC; earlier hours stay missing (no imputation) | Provider archive start; operational sub-study scored from that time | No |
 | 2026-11-08 | 2025 files downloaded but not opened for modelling until the holdout chunk | Protect final holdout | No |
 
+## Step 8 silver-table decisions on November 8 2026
+
+| Date | Decision | Rationale | Holdout errors viewed |
+| --- | --- | --- | --- |
+| 2026-11-08 | Fix METAR UTC parser to accept tokens glued to a prefix (e.g. MET055METAR) | Pilot regex missed about 35% of 2025 rows and 670 JFK rows in April 2024; time rule itself unchanged | No |
+| 2026-11-08 | Silver tables cover local 2017-01-01 to 2026-01-01 on a full UTC hour grid; missing hours kept as rows and listed in outputs/data_audit/step8 | Missing data visible, never hidden or imputed | No |
+| 2026-11-08 | P-7 benchmark uses the file issued the local day before the target day; issue time within that day is not published | Day-ahead benchmark as NYISO publishes it; not origin-matched, reported as such | No |
+| 2026-11-08 | Open-Meteo precipitation is the preceding-hour sum; wind converted from km/h to m/s to match NOAA | Consistent units and interval meaning | No |
+| 2026-11-08 | 2025 rows built for counts only; no 2025 statistics or errors inspected | Protect final holdout | No |
+
