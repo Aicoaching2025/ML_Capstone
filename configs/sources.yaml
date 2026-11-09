@@ -87,6 +87,7 @@ forecast_weather:
   availability_basis: assumed; provider does not publish exact run initialization per offset
   license: CC BY 4.0, free non-commercial API
   status: approved_for_operational_weather_sub_study
+  first_available_valid_time_utc: "2024-01-20T12:00"  # Step 7 check: earlier 2024 hours are null
 nyiso_forecast:
   provider: NYISO
   product: ISO Load Forecast (P-7)
@@ -96,4 +97,4 @@ nyiso_forecast:
   period: ["2017-12", "2025-12"]
   selection_rule: For each target, use the file issued on the local day before the target's local day
   role: operational benchmark for the 24-hour horizon only
-  status: approved_pending_acquisition
+  status: acquired_step7

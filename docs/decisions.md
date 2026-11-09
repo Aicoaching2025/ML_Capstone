@@ -56,3 +56,13 @@ Record subsequent changes, rationale, affected experiments, and whether final-ho
 | 2026-11-06 | Test years 2021-2024; holdout 2025; 2017 warm-up only | Expanding window by year | No |
 | 2026-11-06 | SARIMAX on trailing two-year windows; LSTM deferred; DM tests for primary comparisons only | Protect schedule | No |
 | 2026-11-06 | Approve full-history acquisition via per-file downloads | Bulk archives were too large and failed | No |
+
+## Step 7 acquisition decisions on November 8 2026
+
+| Date | Decision | Rationale | Holdout errors viewed |
+| --- | --- | --- | --- |
+| 2026-11-08 | Acquire full history with per-file, resumable, hashed downloads (scripts/acquire_*.py) | Bulk archives failed; reruns download nothing new | No |
+| 2026-11-08 | Raw files stay in data/bronze (git-ignored); provenance in data/manifests/downloads.csv | Reproducibility without committing data | No |
+| 2026-11-08 | Open-Meteo GFS previous_day2 coverage begins 2024-01-20T12:00 UTC; earlier hours stay missing (no imputation) | Provider archive start; operational sub-study scored from that time | No |
+| 2026-11-08 | 2025 files downloaded but not opened for modelling until the holdout chunk | Protect final holdout | No |
+
