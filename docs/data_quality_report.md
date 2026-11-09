@@ -57,3 +57,14 @@ Three user-supplied LCDv2 2024 files for the intended stations were copied uncha
 ## Step 5 observed-weather pilot completion on November 1 2026
 
 Frozen configuration and the offline build now produce 936 station-hour representatives, 312 Central Park primary records, and 312 one-to-one retrospective load/weather matches with no missing core temperature/dew point/humidity tuple or fallback. Original METAR UTC resolves pilot DATE discrepancies; unmatched annual records remain quarantined. Central Park's 34 missing wind values remain missing, and precipitation traces are distinct from zero. No imputation or operational feature availability was fabricated. All 27 tests pass. See the weather pilot audit for completed policies, source limitations, and later-stage tasks.
+
+## Full-history audit (Step 9) on November 8 2026
+
+The pilot audits are now generalized to all of 2017-2025. See [the full-history audit](data_audit_full_history.md) for tables, figures and limits; `scripts/audit_full_history.py` regenerates it from the Step 8 silver tables in about 35 seconds.
+
+- NYISO Zone J load: all 78,888 expected hours present, no duplicates, nothing imputed. Over 2017-2024 there are no zero, negative or flat-run values. The robust deviation check flags 84 hours on 11 days, and these line up with heat days or the 2021 Independence Day weekend rather than feed faults.
+- Observed weather: 140 hours (0.18%) have no core temperature, dew point and humidity reading at any station. 195 hours (0.25%) use a backup station (193 LaGuardia, 2 JFK). Wind is missing in 12.7% of hours.
+- Station timing: 258 of 236,210 resolved FM-15 rows (0.11%) disagree with LCD DATE read as fixed EST. All fall within 4.2 hours of a DST change. The silver tables use METAR UTC times, so these rows are timed correctly. 47 rows without a recoverable METAR time remain quarantined.
+- NYISO P-7: no missing hours from 2017-12-02. Open-Meteo: 468 null hours, all before 2024-01-20 12:00 UTC.
+- 2025 holdout: counts only. It has 108 hours with no core weather and 3,035 hours with unknown precipitation, which is more than earlier years. This is recorded now so the final evaluation can report it. No 2025 load or weather values were summarized or plotted.
+- Weather range checks on 2017-2024 found no out-of-range temperature, dew point, humidity, wind or precipitation values, and no dew point above temperature.
