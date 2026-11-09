@@ -25,3 +25,5 @@ outputs/data_audit/*
 .ipynb_checkpoints/
 
 .mplconfig/
+data/gold/*
+!data/gold/.gitkeep

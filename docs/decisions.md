@@ -76,3 +76,15 @@ Record subsequent changes, rationale, affected experiments, and whether final-ho
 | 2026-11-08 | Open-Meteo precipitation is the preceding-hour sum; wind converted from km/h to m/s to match NOAA | Consistent units and interval meaning | No |
 | 2026-11-08 | 2025 rows built for counts only; no 2025 statistics or errors inspected | Protect final holdout | No |
 
+## Step 10 feature decisions on November 8 2026
+
+| Date | Decision | Rationale | Holdout errors viewed |
+| --- | --- | --- | --- |
+| 2026-11-08 | One row per target hour, 2018-2025 (70,128 rows per horizon); origin = target end minus horizon | Matches the horizon anchor in study.yaml | No |
+| 2026-11-08 | Load lags and rolling means read from study.yaml and checked with validate_availability() on every row | Leakage excluded by construction; test uses encoded synthetic load | No |
+| 2026-11-08 | 1-hour weather: latest Central Park-first observation with METAR time + 15 min <= origin, at most 3 h old | No stale carry-forward; typical age 69 minutes | No |
+| 2026-11-08 | Wind kept as a column but excluded from feature set C | Optional under the frozen weather rule; about 12% missing | No |
+| 2026-11-08 | Forecast weather matched at valid time = target end; assumed initialization 48 h before and published 6 h after | previous_day2 definition plus conservative GFS latency | No |
+| 2026-11-08 | Holidays from pandas USFederalHolidayCalendar plus NERC subset and day after Thanksgiving | Same holidays as the holidays package; no new dependency | No |
+| 2026-11-08 | Naive baseline values stored in the tables; scored in Step 11 | Baselines pass the same availability checks | No |
+
